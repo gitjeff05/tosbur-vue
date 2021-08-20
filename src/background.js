@@ -1,7 +1,7 @@
 'use strict'
 
 const path = require('path');
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, BrowserView, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -11,11 +11,14 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+let win;
+
 async function createWindow() {
   // Create the browser window.
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1280,
     height: 800,
+    frame: false,
     webPreferences: {
 
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -36,6 +39,21 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  win.maximize();
+
+  let view = new BrowserView();
+
+  ipcMain.on('open-jupyter', (event, arg) => {
+    console.log(`Received IP: ${arg} in main process`);
+    win.setBrowserView(view);
+    let [width, height] = win.getSize();
+    console.log(width, height);
+    view.setBounds({ x: 36, y: 36, width: width - 36, height: height });
+    const args = JSON.parse(arg);
+    console.log(args.ip);
+    view.webContents.loadURL(args.ip);
+  });
 }
 
 // Quit when all windows are closed.

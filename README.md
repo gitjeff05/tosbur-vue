@@ -1,5 +1,7 @@
 # tosbur-vue
 
+The electron wrapper for electron-web 
+
 ## Project setup
 ```
 yarn install
@@ -7,7 +9,7 @@ yarn install
 
 ### Compiles and hot-reloads for development
 ```
-yarn serve
+yarn electron:serve
 ```
 
 ### Compiles and minifies for production
