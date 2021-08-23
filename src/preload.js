@@ -93,8 +93,8 @@ async function getContainers() {
  */
 const imageSettings = {
     AttachStdin: false,
-    AttachStdout: true,
-    AttachStderr: true,
+    AttachStdout: false,
+    AttachStderr: false,
     ExposedPorts: {
         '8888/tcp': {}
     },
@@ -108,8 +108,8 @@ const imageSettings = {
             ]
         }
     },
-    Tty: true,
-    OpenStdin: true,
+    Tty: false,
+    OpenStdin: false,
 };
 
 /**
@@ -118,7 +118,7 @@ const imageSettings = {
  * @param {Object} imageSettings - default settings
  */
 const createImageSettings = (startup, imageSettings) => {
-    console.log('preload: imagesettings', imageSettings)
+    console.log('preload: imageSettings', imageSettings)
     const { mount, image } = startup;
     const { HostConfig } = imageSettings;
     const bindMount = `${mount}:/home/jovyan/`;

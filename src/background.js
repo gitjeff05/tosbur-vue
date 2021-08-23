@@ -1,8 +1,9 @@
 'use strict'
 
 const path = require('path');
+import url from 'url';
+import { access } from 'fs';
 import { app, protocol, BrowserWindow, BrowserView, ipcMain } from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -18,7 +19,7 @@ async function createWindow() {
   win = new BrowserWindow({
     width: 1280,
     height: 800,
-    frame: false,
+    titleBarStyle: 'hiddenInset',
     webPreferences: {
 
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -31,13 +32,14 @@ async function createWindow() {
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    // await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     await win.loadURL("http://localhost:3000")
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
-    createProtocol('app')
-    // Load the index.html when not in development
-    win.loadURL('app://./index.html')
+    const uri = url.pathToFileURL('./static/dist/index.html')
+    access(uri, (err) => {
+      console.log(`${uri} ${err ? 'does not exist' : 'exists'}`);
+    });
+    win.loadURL(uri.href)
   }
 
   win.maximize();

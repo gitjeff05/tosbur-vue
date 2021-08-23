@@ -32,3 +32,5 @@ pnpm-debug.log*
 
 #Electron-builder output
 /dist_electron
+# ignore dist from web-app
+static/*
