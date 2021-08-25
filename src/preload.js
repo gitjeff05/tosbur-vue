@@ -93,7 +93,7 @@ async function getContainers() {
  */
 const imageSettings = {
     AttachStdin: false,
-    AttachStdout: false,
+    AttachStdout: true,
     AttachStderr: false,
     ExposedPorts: {
         '8888/tcp': {}
@@ -108,7 +108,7 @@ const imageSettings = {
             ]
         }
     },
-    Tty: false,
+    Tty: true,
     OpenStdin: false,
 };
 
@@ -173,6 +173,7 @@ async function attachToContainer(container) {
         const response = await got.post(endpoint);
         if (response.body) {
             const ip = getLocalJupyterURL(response.body);
+            console.log(ip);
             ipcRenderer.send('open-jupyter', JSON.stringify({ ...container, ip }));
         }
         return response;
@@ -200,7 +201,15 @@ async function createContainer(startup) {
 async function getImages() {
     try {
         const response = await got(`${process.env.DOCKER_IPC_SOCKET}/${process.env.API_VERSION}/images/json?all=true`);
-        console.log(response)
+        return JSON.parse(response.body);
+    } catch (error) {
+        handleError(error);
+    }
+}
+
+async function getImageInspect(id) {
+    try {
+        const response = await got(`${process.env.DOCKER_IPC_SOCKET}/${process.env.API_VERSION}/images/${id}/json`);
         return JSON.parse(response.body);
     } catch (error) {
         handleError(error);
@@ -215,5 +224,6 @@ contextBridge.exposeInMainWorld('tosbur', {
     createContainer,
     startContainer,
     attachToContainer,
+    getImageInspect,
     title: 'Tosbur'
 });
